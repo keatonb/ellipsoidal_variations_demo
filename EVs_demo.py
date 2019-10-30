@@ -106,11 +106,11 @@ axk = plt.axes([0.25, 0.2, 0.6, 0.03], facecolor=axcolor)
 axinc = plt.axes([0.25, 0.25, 0.6, 0.03], facecolor=axcolor)
 
 
-steff = Slider(axteff, 'Teff (K)', 8300, 30000, valinit=10000, valstep=50, valfmt=u'%1.0f')
-slogg = Slider(axlogg, 'log(g) (cgs)', 4, 7.4, valinit=5.5, valstep = 0.1, valfmt=u'%1.1f')
-sporb = Slider(axporb, 'P_orb (hours)', 0.25, 24, valinit=2, valstep = 0.05)
-sk = Slider(axk, 'K (km/s)', 20, 620, valinit=200, valstep = 10, valfmt=u'%1.0f')
-sinc = Slider(axinc, 'inc (deg)', 1, 90, valinit=45, valstep = 1, valfmt=u'%1.0f')
+steff = Slider(axteff, 'Teff (K)', 8300, 30000, valinit=10000, valfmt=u'%1.0f') #valstep=50, 
+slogg = Slider(axlogg, 'log(g) (cgs)', 4, 7.4, valinit=5.5, valfmt=u'%1.1f') #valstep = 0.1, 
+sporb = Slider(axporb, 'P_orb (hours)', 0.25, 24, valinit=2 ) #valstep = 0.05
+sk = Slider(axk, 'K (km/s)', 20, 620, valinit=200,  valfmt=u'%1.0f') #valstep = 10,
+sinc = Slider(axinc, 'inc (deg)', 1, 90, valinit=45, valfmt=u'%1.0f') #valstep = 1, 
 
 M1=0
 M2=0
