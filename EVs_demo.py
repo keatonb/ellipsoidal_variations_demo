@@ -116,19 +116,32 @@ M1=0
 M2=0
 R1=0
 
-def calc():
-    M1,_ = getMass(steff.val,slogg.val)
-    ulimb = getlimbdarkening(slogg.val,steff.val)
-    tau = getgravdarkening(steff.val)
-    R1 = np.sqrt(G*M1*MSun/(10.**slogg.val))/RSun
-    M2 = getM2(M1*MSun,sporb.val*3600,sk.val*1e5,sinc.val*np.pi/180.)/MSun
-    A = np.power((sporb.val*3600)**2.*G*(M1+M2)*MSun/(4.*np.pi**2.),1./3.)/RSun
-    merge = np.power((M1+M2),1./3.)*np.power(sporb.val,8./3.)*1e-2/(M1*M2)
-    DB = 100*2*sk.val*1e5/c #approx.
+def calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val):
+    """
+    Compute parameters for low-mass white dwarf tight binary
+    
+    Inputs:
+        - teff (K)
+        - logg (cgs)
+        - porb (hours!)
+        - k (km/s)
+        -inc (deg)
+    
+    Outputs:
+        - DataFrame w/ M1,R1,M2,A,t_merge,EV(%),DV(%)    
+    """
+    M1,_ = getMass(teff,logg,)
+    ulimb = getlimbdarkening(logg,teff)
+    tau = getgravdarkening(teff)
+    R1 = np.sqrt(G*M1*MSun/(10.**logg))/RSun
+    M2 = getM2(M1*MSun,porb*3600,k*1e5,inc*np.pi/180.)/MSun
+    A = np.power((porb*3600)**2.*G*(M1+M2)*MSun/(4.*np.pi**2.),1./3.)/RSun
+    merge = np.power((M1+M2),1./3.)*np.power(porb,8./3.)*1e-2/(M1*M2)
+    DB = 100*2*k*1e5/c #approx.
     
     #Calc ellipsoidal vars
-    numer=3.*np.pi**2.*(15. + ulimb)*(1. + tau)*M2*MSun*(R1*RSun)**3.*np.sin(sinc.val*np.pi/180.)**2.
-    denom=5.*(sporb.val*3600.)**2.*(3.-ulimb)*G*M1*(M1+M2)*MSun**2.
+    numer=3.*np.pi**2.*(15. + ulimb)*(1. + tau)*M2*MSun*(R1*RSun)**3.*np.sin(inc*np.pi/180.)**2.
+    denom=5.*(porb*3600.)**2.*(3.-ulimb)*G*M1*(M1+M2)*MSun**2.
     EV=100.*numer/denom
     return pd.DataFrame({"M1 (MSun)":M1,"R1 (RSun)":R1,"M2 (MSun)":M2,"A (RSun)":A,
                          "merge (Gyr)":merge,"EV (%)":EV,"DB (%)":DB},
