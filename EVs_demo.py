@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button, RadioButtons
+from matplotlib.widgets import Slider
 from scipy.interpolate import interp1d,interp2d
 import pandas as pd
 
@@ -116,7 +116,7 @@ M1=0
 M2=0
 R1=0
 
-def calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val):
+def calc(teff,logg,porb,k,inc):
     """
     Compute parameters for low-mass white dwarf tight binary
     
@@ -148,16 +148,16 @@ def calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val):
                     columns = ["M1 (MSun)","R1 (RSun)","M2 (MSun)","A (RSun)","merge (Gyr)","EV (%)","DB (%)"])
 
 def update(val):
-    df = calc()
+    df = calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val)
     l.set_ydata(-df["EV (%)"][0]*np.cos(phasesample*4*np.pi) + 
                 df["DB (%)"][0]*np.sin(phasesample*2*np.pi))
     
     for i in range(len(df.values[0])):
         mpl_table._cells[(1, i)]._text.set_text('%.4f' % df.values[0][i])
-    
+        
     fig.canvas.draw_idle()
 
-df = calc()
+df = calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val)
 
 axvals = plt.axes([0.12, 0.88, 0.78, 0.1], facecolor=axcolor)
 font_size=8
