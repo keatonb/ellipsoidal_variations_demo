@@ -83,39 +83,6 @@ def getM2(M1,P,K,i):
     M2interp = interp1d(((M2sample*np.sin(i))**3./(M1+M2sample)**2),M2sample,bounds_error=False,fill_value="extrapolate")
     return M2interp(P*K**3./(2.*np.pi*G))
 
-fig, ax = plt.subplots()
-
-plt.subplots_adjust(left=0.12, bottom=0.4,top=0.8)
-phasesample = np.linspace(0,1,101)
-l, = ax.plot(phasesample,phasesample, lw=2)
-ax.set_ylabel("rel. flux (%)")
-ax.set_xlabel("phase")
-ax.set_ylim(-10,10)
-ax.margins(x=0)
-
-topax = ax.twiny()
-topax.set_xticks([0,0.25,0.5,0.75,1])
-topax.set_xticklabels(['farthest','toward','nearest','away','farthest'])
-
-axcolor = 'lightgoldenrodyellow'
-
-axteff = plt.axes([0.25, 0.05, 0.6, 0.03], facecolor=axcolor)
-axlogg = plt.axes([0.25, 0.1, 0.6, 0.03], facecolor=axcolor)
-axporb = plt.axes([0.25, 0.15, 0.6, 0.03], facecolor=axcolor)
-axk = plt.axes([0.25, 0.2, 0.6, 0.03], facecolor=axcolor)
-axinc = plt.axes([0.25, 0.25, 0.6, 0.03], facecolor=axcolor)
-
-
-steff = Slider(axteff, 'Teff (K)', 8300, 30000, valinit=10000, valfmt=u'%1.0f') #valstep=50, 
-slogg = Slider(axlogg, 'log(g) (cgs)', 4, 7.4, valinit=5.5, valfmt=u'%1.1f') #valstep = 0.1, 
-sporb = Slider(axporb, 'P_orb (hours)', 0.25, 24, valinit=2 ) #valstep = 0.05
-sk = Slider(axk, 'K (km/s)', 20, 620, valinit=200,  valfmt=u'%1.0f') #valstep = 10,
-sinc = Slider(axinc, 'inc (deg)', 1, 90, valinit=45, valfmt=u'%1.0f') #valstep = 1, 
-
-M1=0
-M2=0
-R1=0
-
 def calc(teff,logg,porb,k,inc):
     """
     Compute parameters for low-mass white dwarf tight binary
@@ -147,34 +114,68 @@ def calc(teff,logg,porb,k,inc):
                          "merge (Gyr)":merge,"EV (%)":EV,"DB (%)":DB},
                     columns = ["M1 (MSun)","R1 (RSun)","M2 (MSun)","A (RSun)","merge (Gyr)","EV (%)","DB (%)"])
 
-def update(val):
-    df = calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val)
-    l.set_ydata(-df["EV (%)"][0]*np.cos(phasesample*4*np.pi) + 
-                df["DB (%)"][0]*np.sin(phasesample*2*np.pi))
+
+def main():    
+    fig, ax = plt.subplots()
     
-    for i in range(len(df.values[0])):
-        mpl_table._cells[(1, i)]._text.set_text('%.4f' % df.values[0][i])
+    plt.subplots_adjust(left=0.12, bottom=0.4,top=0.8)
+    phasesample = np.linspace(0,1,101)
+    l, = ax.plot(phasesample,phasesample, lw=2)
+    ax.set_ylabel("rel. flux (%)")
+    ax.set_xlabel("phase")
+    ax.set_ylim(-10,10)
+    ax.margins(x=0)
+    
+    topax = ax.twiny()
+    topax.set_xticks([0,0.25,0.5,0.75,1])
+    topax.set_xticklabels(['farthest','toward','nearest','away','farthest'])
+    
+    axcolor = 'lightgoldenrodyellow'
+    
+    axteff = plt.axes([0.25, 0.05, 0.6, 0.03], facecolor=axcolor)
+    axlogg = plt.axes([0.25, 0.1, 0.6, 0.03], facecolor=axcolor)
+    axporb = plt.axes([0.25, 0.15, 0.6, 0.03], facecolor=axcolor)
+    axk = plt.axes([0.25, 0.2, 0.6, 0.03], facecolor=axcolor)
+    axinc = plt.axes([0.25, 0.25, 0.6, 0.03], facecolor=axcolor)
+    
+    steff = Slider(axteff, 'Teff (K)', 8300, 30000, valinit=10000, valfmt=u'%1.0f') #valstep=50, 
+    slogg = Slider(axlogg, 'log(g) (cgs)', 4, 7.4, valinit=5.5, valfmt=u'%1.1f') #valstep = 0.1, 
+    sporb = Slider(axporb, 'P_orb (hours)', 0.25, 24, valinit=2 ) #valstep = 0.05
+    sk = Slider(axk, 'K (km/s)', 20, 620, valinit=200,  valfmt=u'%1.0f') #valstep = 10,
+    sinc = Slider(axinc, 'inc (deg)', 1, 90, valinit=45, valfmt=u'%1.0f') #valstep = 1, 
+    
+    def update(val):
+        df = calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val)
+        l.set_ydata(-df["EV (%)"][0]*np.cos(phasesample*4*np.pi) + 
+                    df["DB (%)"][0]*np.sin(phasesample*2*np.pi))
         
-    fig.canvas.draw_idle()
+        for i in range(len(df.values[0])):
+            mpl_table._cells[(1, i)]._text.set_text('%.4f' % df.values[0][i])
+            
+        fig.canvas.draw_idle()
+    
+    df = calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val)
 
-df = calc(teff=steff.val,logg=slogg.val,porb=sporb.val,k=sk.val,inc=sinc.val)
+    axvals = plt.axes([0.12, 0.88, 0.78, 0.1], facecolor=axcolor)
+    font_size=8
+    bbox=[0, 0, 1, 1]
+    axvals.axis('off')
+    mpl_table = axvals.table(cellText = [['%.4f' % j for j in i] for i in df.values],
+                             bbox=bbox, colLabels=df.columns)
+    mpl_table.auto_set_font_size(False)
+    mpl_table.set_fontsize(font_size)
+    
+    update(1)
+    
+    
+    steff.on_changed(update)
+    slogg.on_changed(update)
+    sporb.on_changed(update)
+    sk.on_changed(update)
+    sinc.on_changed(update)
+    
+    plt.show()
 
-axvals = plt.axes([0.12, 0.88, 0.78, 0.1], facecolor=axcolor)
-font_size=8
-bbox=[0, 0, 1, 1]
-axvals.axis('off')
-mpl_table = axvals.table(cellText = [['%.4f' % j for j in i] for i in df.values],
-                         bbox=bbox, colLabels=df.columns)
-mpl_table.auto_set_font_size(False)
-mpl_table.set_fontsize(font_size)
-
-update(1)
-
-
-steff.on_changed(update)
-slogg.on_changed(update)
-sporb.on_changed(update)
-sk.on_changed(update)
-sinc.on_changed(update)
-
-plt.show()
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
